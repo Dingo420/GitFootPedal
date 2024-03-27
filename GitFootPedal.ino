@@ -10,7 +10,7 @@
 #define TFT_RST        8 // Or set to -1 and connect to Arduino RESET pin
 #define TFT_DC         9
 Adafruit_ST7735 tft = Adafruit_ST7735(TFT_CS, TFT_DC, TFT_RST);
-Encoder myEnc(1, 0);
+Encoder myEnc(0, 1);// Reverse these to reverse count on encoder CW = Up or CW= Down , i feel like i wired these backwards between my harware and yours, by accedent, 420!
 
 long oldPosition  = -999;
 int FootPedalButton = 5 ;
@@ -18,7 +18,7 @@ int FootPedalState =0;
 int EncoderSwitch = 7;
 int EncoderSwitchState =0;
 
-float p = 3.1415926;
+float p = 3.1415926; // not used old copied code???
 uint16_t time;
 
 const unsigned char Dog128_64 [] PROGMEM = {
@@ -135,38 +135,52 @@ void loop() {
 
   if (FootPedalState == 0) {     
     switch (newPosition){
+
       case 0:
         tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("clicker");
         break;
       
       case 4:
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("walk");
         break;
     
       case 8:
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("sftclk");
         break;
     
       case 12:
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("tree");
         break;
     
       case 16:
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("garbage");
         break;
     
       case 20:
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("backwall");
         break;   
     
       case 24:
+        tft.fillScreen(ST77XX_BLACK);
+        tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("cobble");
         break;  
@@ -180,43 +194,86 @@ void loop() {
 
     case 0:
       tft.fillScreen(ST77XX_BLACK);
-          
       while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
         if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
         else {FootPedalState=1;}
         tft.setCursor(0,0);
         tft.print("CLICKER");
+        //run function
       }  
       break;
 
     case 4:
-      tft.print("WALK");
+      tft.fillScreen(ST77XX_BLACK);
+      while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
+        if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+        else {FootPedalState=1;}
+        tft.setCursor(0,0);
+        tft.print("WALK");
+        //run function
+      }
       break;
 
     case 8:
-      tft.print("SHFTCLK");
-      //ShiftClick();
+      tft.fillScreen(ST77XX_BLACK);
+      while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
+        if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+        else {FootPedalState=1;}
+        tft.setCursor(0,0);
+        tft.print("SHFTCLK");
+        //run function
+      }
       break;
    
     case 12:
-      tft.print("TREE");
-      //TreeCutter();
+      tft.fillScreen(ST77XX_BLACK);
+      while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
+        if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+        else {FootPedalState=1;}
+        tft.setCursor(0,0);
+        tft.print("TREE");
+        //run function
+      }
       break;
 
     case 16:
-      tft.print("GARBAGE");
-      //Garbage();
+      tft.fillScreen(ST77XX_BLACK);
+      while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
+        if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+        else {FootPedalState=1;}
+        tft.setCursor(0,0);
+        tft.print("GARBAGE");
+        //run function
+      }
       break;
        
     case 20:
-      tft.print("BACKWALL");
-      //BackWall();
+      tft.fillScreen(ST77XX_BLACK);
+      while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
+        if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+        else {FootPedalState=1;}
+        tft.setCursor(0,0);
+        tft.print("BACKWALL");
+        //run function
+      }
       break;
 
     case 24:
-
-      tft.print("COBBLE");
-      // Cobble();
+      tft.fillScreen(ST77XX_BLACK);
+      while (FootPedalState == 1) {
+        tft.setTextColor(ST7735_GREEN);
+        if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+        else {FootPedalState=1;}
+        tft.setCursor(0,0);
+        tft.print("COBBLE");
+        //run function
+      }
       break;  
   }
   }
