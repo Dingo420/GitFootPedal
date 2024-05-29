@@ -1,8 +1,20 @@
+/*Mode of opperation
+ Post, And setup hardware
+ Show Welcome screen
+ Check Encoder Pos
+ - Show "Menu Screen" (Select macro)
+ - Wait for pedal to be pressed
+ - Run program once or until pedal is released... This needs more thought.
+ - Go back to "Menu Screen"
+Profit!
+*/ 
+
+
 #include <Mouse.h>
 #include <Keyboard.h>
 #include <Adafruit_GFX.h>    // Core graphics library
-#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735
-#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789
+#include <Adafruit_ST7735.h> // Hardware-specific library for ST7735 Screen
+#include <Adafruit_ST7789.h> // Hardware-specific library for ST7789 Screen
 #include <SPI.h>
 #include <Encoder.h>
 
@@ -18,7 +30,7 @@ int FootPedalState =0;
 int EncoderSwitch = 7;
 int EncoderSwitchState =0;
 
-float p = 3.1415926; // not used old copied code???
+//float p = 3.1415926; // not used old copied code???
 uint16_t time;
 
 const unsigned char Dog128_64 [] PROGMEM = {
@@ -109,76 +121,151 @@ void setup(void) {
   tft.print("Controller");
   delay(1000);
   //tft.drawBitmap(0, 0, Dog128_64, 128, 64, ST77XX_WHITE);
-  //delay(5000);
+  //delay(3000);
   tft.fillRect(0,0,240,240,ST77XX_BLACK); // clear screen
   
 }
 
 void loop() {
 
+
+// "Check Encoder"
   long newPosition = myEnc.read();
 
+  // cap encoder values
   if ( newPosition > 40 ) {newPosition= 40;myEnc.write(40);}
   if ( newPosition < 0 ) {newPosition= 0;myEnc.write(0);}
-    
+
+  // this sets an oldPosition for some reason? to check direction? because it should only be 1  # a way, either way ,no?  
   if (newPosition != oldPosition) {
     oldPosition = newPosition;
   }
 
-  // check encoder Button state
-  if (digitalRead(7)){EncoderSwitchState=0;}
-  else {EncoderSwitchState=1;}
+  // check encoder Button state NOT NEEDED, BUT NICE TO KNOW FOR LATER
+  //if (digitalRead(7)){EncoderSwitchState=0;}
+  //else {EncoderSwitchState=1;}
 
-  // check Foot Pedal State
-  if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
-  else {FootPedalState=1;}
+  // check Foot Pedal State NOT NEEDED, BUT NICE TO KNOW FOR LATER
+  //if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+  //else {FootPedalState=1;}
 
+
+ switch (newPosition){
+    case 0: case 1: case 2: case 3:// Thanks Arthur
+      tft.fillScreen(ST77XX_BLACK);
+      tft.setTextColor(ST7735_BLUE);
+      tft.setCursor(0,0);
+      tft.print("Walk");
+      
+      //loop for ever untill pedal is pressed OR ENCODER CHANFES to break?
+      while (1){
+        //wait for state change as to not flash screen
+        //check pedal and encoder state
+        // 1. break if  encoder changed
+        newPosition = myEnc.read();
+        if (newPosition >3){break;}
+
+        // 2. run programm if pedal pressed
+        while (!digitalRead(FootPedalButton)){ // cant do while , cuz this needs to be cheked again to break?
+          tft.fillScreen(ST77XX_GREEN); 
+          Keyboard.press(119);//"w"
+         //delay(100); // this delays naturally with pedal hold...
+          if (digitalRead(FootPedalButton)) {
+            tft.fillScreen(ST77XX_RED); 
+            
+            Keyboard.release(119);//"w"
+            delay(100); // this here to "show red and not just flash for a ms"
+            
+            goto bailout; // this exits, but then runs through all cases.... moved location to just after default and this WORKS !!!!!
+            //end work? loop(); wont work, contunue also dosent workwill this send back to start? , Yes , but now also runs next case....?
+            //break; 
+          }
+        }
+      } 
+  
+    case 4: case 5: case 6: case 7:
+      tft.fillScreen(ST77XX_BLACK);
+      tft.setTextColor(ST7735_BLUE);
+      tft.setCursor(0,0);
+      tft.print("Two");
+     //loop for ever untill pedal is pressed OR ENCODER CHANFES to break?
+      while (1){
+        //wait for state change as to not flash screen
+        //check pedal and encoder state
+        // 1. break if  encoder changed
+        newPosition = myEnc.read();
+        if (newPosition <4) {break;}
+        if (newPosition >7) {break;}
+
+        // 2. run programm if pedal pressed
+        if (!digitalRead(FootPedalButton)){
+          tft.fillScreen(ST77XX_GREEN);
+          delay(100);
+          break;
+        }
+      } 
+
+    default:
+    bailout:
+     tft.fillScreen(ST77XX_BLACK);
+    break;
+ }
+
+
+// this is wrong dont look at foot pedal state yet. look at encoder then run program when pressed. duh..... FML
+  /*
   if (FootPedalState == 0) {     
     switch (newPosition){
 
-      case 0:
+      case 0: case 1: case 2: case 3: // this shit that house taught me , can i make it work? I also feel that i chose a bad way to do this... No comma!!!
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
-        tft.print("clicker");
+        tft.print("Lever");
+        
+          if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
+          else {FootPedalState=1;}
+
+          if (FootPedalState = 0){delay(1000);} // trap here , this is probbably bad...? then hopfully break.
+
         break;
       
-      case 4:
+      case 4: case 5: case 6: case 7:
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
-        tft.print("walk");
+        tft.print("BedRock");
         break;
     
-      case 8:
+      case 8: case 9: case 10: case 11:
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("sftclk");
         break;
     
-      case 12:
+      case 12: case 13: case 14: case 15:
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("tree");
         break;
     
-      case 16:
+      case 16: case 17: case 18: case 19:
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("garbage");
         break;
     
-      case 20:
+      case 20: case 21: case 22: case 23:
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
         tft.print("backwall");
         break;   
     
-      case 24:
+      case 24: case 25: case 26: case 27:
         tft.fillScreen(ST77XX_BLACK);
         tft.setTextColor(ST7735_BLUE);
         tft.setCursor(0,0);
@@ -188,31 +275,42 @@ void loop() {
     }
   }
   
-
   if (FootPedalState == 1) {    
-  switch (newPosition){
+    switch (newPosition){
 
     case 0:
       tft.fillScreen(ST77XX_BLACK);
+      
       while (FootPedalState == 1) {
+        
         tft.setTextColor(ST7735_GREEN);
         if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
         else {FootPedalState=1;}
         tft.setCursor(0,0);
-        tft.print("CLICKER");
-        //run function
+        tft.print("LEVER");
+       // Mouse.press(MOUSE_RIGHT);
+        //delay(50);
+        //Mouse.release(MOUSE_RIGHT);
+        //delay(5000);
+
       }  
       break;
 
     case 4:
-      tft.fillScreen(ST77XX_BLACK);
+       tft.fillScreen(ST77XX_BLACK);
+      
       while (FootPedalState == 1) {
+        
         tft.setTextColor(ST7735_GREEN);
         if (digitalRead(FootPedalButton)){FootPedalState=0;} // inverted because of pull-down resistors
         else {FootPedalState=1;}
         tft.setCursor(0,0);
-        tft.print("WALK");
-        //run function
+        tft.print("BEDROCK");
+        Mouse.press(MOUSE_RIGHT);
+        delay(25);
+        Mouse.release(MOUSE_RIGHT);
+        delay(25);
+
       }
       break;
 
@@ -275,9 +373,14 @@ void loop() {
         //run function
       }
       break;  
+    }
   }
-  }
+
+  */
+
 }
+
+
 void Cobble(){
   Mouse.press();
   delay(600);
